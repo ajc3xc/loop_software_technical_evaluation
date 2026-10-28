@@ -15,20 +15,29 @@ export interface BoardCase {
 export function loadBoardCases(): BoardCase[] {
   const cases = boardCases.cases as BoardCase[];
   const ids = new Set<string>();
+  const placements = new Set<string>();
 
   for (const entry of cases) {
-    const isComplete =
-      Boolean(entry.id && entry.section && entry.column && entry.task) &&
+    const hasFields = Boolean(entry.id && entry.section && entry.column && entry.task);
+    const hasTags =
       Array.isArray(entry.tags) &&
-      entry.tags.length > 0;
+      entry.tags.length > 0 &&
+      entry.tags.every((tag) => typeof tag === 'string' && tag.trim() !== '');
 
-    if (!isComplete) {
+    if (!hasFields || !hasTags) {
       throw new Error(`Invalid board case: ${JSON.stringify(entry)}`);
     }
     if (ids.has(entry.id)) {
       throw new Error(`Duplicate board case id: ${entry.id}`);
     }
+
+    const placement = `${entry.section} / ${entry.column} / ${entry.task}`;
+    if (placements.has(placement)) {
+      throw new Error(`Duplicate board case: ${placement}`);
+    }
+
     ids.add(entry.id);
+    placements.add(placement);
   }
 
   return cases;

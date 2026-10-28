@@ -4,7 +4,8 @@ import { loadBoardCases } from './data/load-cases';
 
 // Offline check of the page object. It renders a static copy of the board markup
 // with page.setContent, so it needs no network and no login. It proves the locators
-// match the markup the demo app renders and that a wrong column is reported.
+// match the markup the demo app renders, that the sidebar switches projects, and that
+// a wrong column is reported.
 
 const boardCases = loadBoardCases();
 
@@ -14,6 +15,15 @@ const escapeHtml = (text: string): string =>
   text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 const sectionNames = [...new Set(boardCases.map((boardCase) => boardCase.section))];
+
+// The real app switches the header when a sidebar project is clicked. Mirror that here.
+const NAV_SCRIPT = `<script>
+  document.querySelectorAll('nav button').forEach((button) => {
+    button.addEventListener('click', () => {
+      document.querySelector('header h1').textContent = button.querySelector('h2').textContent;
+    });
+  });
+</script>`;
 
 function columnsFor(section: string): Columns {
   const columns: Columns = {};
@@ -46,7 +56,8 @@ function boardHtml(section: string, columns: Columns): string {
   return (
     `<aside><nav>${nav}</nav></aside>` +
     `<header><h1>${escapeHtml(section)}</h1></header>` +
-    `<main>${columnMarkup}</main>`
+    `<main>${columnMarkup}</main>` +
+    NAV_SCRIPT
   );
 }
 
@@ -75,6 +86,16 @@ test.describe('Board page object against static markup', () => {
 
     const board = new BoardPage(page);
     await board.openSection('Web Application');
-    await expect(board.expectTaskInColumn('To Do', moved.task)).rejects.toThrow();
+
+    // Positive control: the task really is under Done in this fixture.
+    await expect(board.card('Done', moved.task)).toBeVisible();
+    // The failure must come from the visibility assertion, not a missing element or page error.
+    const failure = await board.expectTaskInColumn('To Do', moved.task).then(
+      () => undefined,
+      (error: Error) => error,
+    );
+    // Strip any ANSI colour codes before matching the message.
+    const message = (failure?.message ?? '').replace(/\u001b\[[\d;]*m/g, '');
+    expect(message).toContain('expect(locator).toBeVisible() failed');
   });
 });
