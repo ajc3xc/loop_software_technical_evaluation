@@ -49,6 +49,6 @@ export async function openSignedIn(page: Page): Promise<void> {
   await expect(projectsHeading(page).or(loginField)).toBeVisible();
 
   if (await loginField.isVisible()) {
-    throw new Error('The saved session has expired. Re-create .auth/demo.json with codegen.');
+    throw new Error('The saved session has expired. Run: npm run auth:save');
   }
 }

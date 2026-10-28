@@ -43,21 +43,21 @@ DEMO_USERNAME=admin DEMO_PASSWORD=password123 npm test
 DEMO_APP_URL=https://create-asana-like-pr-39y5.bolt.host/ npm test
 ```
 
-## Saved login session (optional)
+## Saved login session (for the board checks)
 
-To run the board checks without typing the password on each run, save a login session once:
-
-```bash
-npx playwright codegen --save-storage=.auth/demo.json https://create-asana-like-pr-39y5.bolt.host/
-```
-
-Sign in in the browser that opens, then close it. Then run the board checks with the saved session:
+The board checks can run without typing the password each time. Save a signed-in session once:
 
 ```bash
-DEMO_USE_SAVED_SESSION=1 npx playwright test tests/board-cases.spec.ts
+npm run auth:save
 ```
 
-The saved session covers the board checks only. `tests/login.spec.ts` always signs in through the form. The app's login expires after 24 hours, so re-create the file when the checks start failing with a session error. `.auth/` is git-ignored.
+A browser opens on the demo app. Sign in there yourself. The session saves automatically when the project board appears, and the browser closes. Then run the board checks with it:
+
+```bash
+npm run test:live
+```
+
+The saved session covers the board checks only. `tests/login.spec.ts` always signs in through the form. The app's login expires after 24 hours, so run `npm run auth:save` again when `test:live` reports an expired session. The file lives in `.auth/`, which is git-ignored.
 
 ## Layout
 

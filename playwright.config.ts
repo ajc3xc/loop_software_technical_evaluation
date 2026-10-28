@@ -2,16 +2,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
 
-// Saved login session written by `npx playwright codegen --save-storage=.auth/demo.json`.
-// Only used when DEMO_USE_SAVED_SESSION=1, so the default run still signs in through the form.
-const savedSession = path.join(__dirname, '.auth', 'demo.json');
+// Saved login session written by `npm run auth:save`. Only used when DEMO_USE_SAVED_SESSION=1,
+// so the default run still signs in through the form.
+const savedSession = path.resolve(__dirname, process.env.DEMO_SESSION_FILE || path.join('.auth', 'demo.json'));
 const useSavedSession = process.env.DEMO_USE_SAVED_SESSION === '1';
 
 if (useSavedSession && !fs.existsSync(savedSession)) {
-  throw new Error(
-    `DEMO_USE_SAVED_SESSION=1 but ${savedSession} is missing. Create it with: ` +
-      'npx playwright codegen --save-storage=.auth/demo.json https://create-asana-like-pr-39y5.bolt.host/',
-  );
+  throw new Error(`DEMO_USE_SAVED_SESSION=1 but ${savedSession} is missing. Run: npm run auth:save`);
 }
 
 export default defineConfig({
