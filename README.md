@@ -43,6 +43,22 @@ DEMO_USERNAME=admin DEMO_PASSWORD=password123 npm test
 DEMO_APP_URL=https://create-asana-like-pr-39y5.bolt.host/ npm test
 ```
 
+## Saved login session (optional)
+
+To run the board checks without typing the password on each run, save a login session once:
+
+```bash
+npx playwright codegen --save-storage=.auth/demo.json https://create-asana-like-pr-39y5.bolt.host/
+```
+
+Sign in in the browser that opens, then close it. Then run the board checks with the saved session:
+
+```bash
+DEMO_USE_SAVED_SESSION=1 npx playwright test tests/board-cases.spec.ts
+```
+
+The saved session covers the board checks only. `tests/login.spec.ts` always signs in through the form. The app's login expires after 24 hours, so re-create the file when the checks start failing with a session error. `.auth/` is git-ignored.
+
 ## Layout
 
 | Path | Purpose |
@@ -50,7 +66,8 @@ DEMO_APP_URL=https://create-asana-like-pr-39y5.bolt.host/ npm test
 | `tests/data/board-cases.json` | The six cases. The only file to edit to add or change a check. |
 | `tests/data/load-cases.ts` | Loads the JSON and fails fast on missing fields or duplicate ids. |
 | `tests/board-cases.spec.ts` | Generates one test per JSON entry. Contains no per-case code. |
-| `tests/helpers/login.ts` | Signs in and waits for the project list. Reads credentials from the environment. |
+| `tests/login.spec.ts` | Signs in through the form with the demo credentials and checks the project list. |
+| `tests/helpers/login.ts` | Signs in through the form, or reuses a saved session. Reads credentials from the environment. |
 | `tests/pages/board-page.ts` | Page object: open a project, find a column, find a card, check its tags. |
 | `tests/board-page.offline.spec.ts` | Runs the page object against static copies of the board markup. No network or login needed. |
 | `playwright.config.ts` | Base URL, viewport (1440x900), retries in CI, and the trace and screenshot settings. |
@@ -80,7 +97,7 @@ Add an object to `tests/data/board-cases.json`:
 
 Each generated test does the following:
 
-1. Logs in through the form and waits for the "Projects" heading.
+1. Signs in (through the form, or from the saved session) and waits for the "Projects" heading.
 2. Clicks the project in the sidebar and waits for its title.
 3. Checks that the task heading is inside the column whose heading reads `<column> (<n>)`.
 4. Checks that each expected tag is shown on that task's card.

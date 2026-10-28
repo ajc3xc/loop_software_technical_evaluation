@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
-import { login } from './helpers/login';
+import { openSignedIn } from './helpers/login';
 import { BoardPage } from './pages/board-page';
 import { loadBoardCases } from './data/load-cases';
 
@@ -9,7 +9,7 @@ const boardCases = loadBoardCases();
 test.describe('Project board: task column and tags', () => {
   for (const boardCase of boardCases) {
     test(`${boardCase.id}: "${boardCase.task}" is in "${boardCase.column}" on ${boardCase.section}`, async ({ page }) => {
-      await login(page);
+      await openSignedIn(page);
 
       const board = new BoardPage(page);
       await board.openSection(boardCase.section);
