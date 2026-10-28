@@ -1,0 +1,32 @@
+{
+  "name": "loop_software_technical_evaluation",
+  "version": "1.0.0",
+  "description": "Data-driven Playwright + TypeScript suite for the Asana-like demo app board",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:list": "playwright test --list",
+    "typecheck": "tsc --noEmit",
+    "report": "playwright show-report"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajc3xc/loop_software_technical_evaluation.git"
+  },
+  "keywords": [
+    "playwright",
+    "typescript",
+    "data-driven-testing"
+  ],
+  "author": "Adam Camerer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ajc3xc/loop_software_technical_evaluation/issues"
+  },
+  "homepage": "https://github.com/ajc3xc/loop_software_technical_evaluation#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "typescript": "^5.9.3"
+  }
+}

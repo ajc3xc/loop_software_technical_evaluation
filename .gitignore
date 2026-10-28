@@ -218,3 +218,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Playwright / Node
+node_modules/
+playwright-report/
+test-results/
+blob-report/
